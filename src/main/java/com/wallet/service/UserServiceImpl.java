@@ -1,5 +1,6 @@
 package com.wallet.service;
 
+import com.wallet.dto.LoginRequestDto;
 import com.wallet.dto.RegisterRequestDto;
 import com.wallet.repository.UserRepository;
 import com.wallet.repository.WalletRepository;
@@ -36,22 +37,19 @@ public class UserServiceImpl implements UserService{
         }
     }
 
-    public User login(String email, String password) throws SQLException, ClassNotFoundException {
-        Connection conn = DBConnection.getConnection();
+    public User login(LoginRequestDto dto) throws SQLException, ClassNotFoundException {
 
-        try{
-            User user = userDao.findUserByEmail(conn, email);
+        try (Connection conn = DBConnection.getConnection()) {
+            User user = userDao.findUserByEmail(conn, dto.getEmail());
 
-            if(user == null){
+            if (user == null) {
                 throw new RuntimeException("User not Found");
             }
-            if(!user.getPassword().equals(password)){
+            if (!user.getPassword().equals(dto.getPassword())) {
                 throw new RuntimeException("Invalid Password");
             }
 
             return user;
-        } finally {
-            conn.close();
         }
     }
 }

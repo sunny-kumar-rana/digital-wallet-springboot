@@ -1,5 +1,6 @@
 package com.wallet.controller;
 
+import com.wallet.dto.LoginRequestDto;
 import com.wallet.model.User;
 import com.wallet.service.UserServiceImpl;
 import jakarta.servlet.annotation.WebServlet;
@@ -21,10 +22,12 @@ public class AuthController extends HttpServlet {
 
         try{
 
-            String email = request.getParameter("email");
-            String password = request.getParameter("password");
+            LoginRequestDto dto = new LoginRequestDto();
 
-            User user = userServiceImpl.login(email, password);
+            dto.setEmail(request.getParameter("email"));
+            dto.setPassword(request.getParameter("password"));
+
+            User user = userServiceImpl.login(dto);
 
             HttpSession session = request.getSession(true);
             session.setAttribute("userId", user.getId());

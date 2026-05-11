@@ -1,7 +1,7 @@
 package com.wallet.controller;
 
 
-import com.wallet.service.WalletServiceImplmnt;
+import com.wallet.service.WalletServiceImpl;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 
 @WebServlet("/balance")
 public class WalletController extends HttpServlet {
-    private WalletServiceImplmnt walletServiceImplmnt = new WalletServiceImplmnt();
+    private WalletServiceImpl walletServiceImpl = new WalletServiceImpl();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response){
 
@@ -23,7 +23,7 @@ public class WalletController extends HttpServlet {
                 throw new RuntimeException("Not Logged In");
             }
             long userId = (Long)request.getSession().getAttribute("userId");
-            BigDecimal balance = walletServiceImplmnt.getBalance(userId);
+            BigDecimal balance = walletServiceImpl.getBalance(userId);
 
             PrintWriter pw = response.getWriter();
             pw.println("Balance = " + balance);

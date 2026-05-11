@@ -4,14 +4,14 @@ import com.wallet.repository.TransactionRepository;
 import com.wallet.repository.WalletRepository;
 import com.wallet.model.Transaction;
 import com.wallet.model.Wallet;
-import com.wallet.util.dbconnection.DBConnection;
+import com.wallet.util.DBConnection;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-public class WalletServiceImplmnt implements WalletService{
+public class WalletServiceImpl implements WalletService{
     private WalletRepository walletDao = new WalletRepository();
     private TransactionRepository transactionDao = new TransactionRepository();
 

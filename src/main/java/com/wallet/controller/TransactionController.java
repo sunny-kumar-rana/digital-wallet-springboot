@@ -1,7 +1,7 @@
 package com.wallet.controller;
 
 import com.wallet.model.Transaction;
-import com.wallet.service.WalletServiceImplmnt;
+import com.wallet.service.WalletServiceImpl;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,7 +15,7 @@ import java.util.List;
 @WebServlet("/transactions")
 public class TransactionController extends HttpServlet {
 
-    WalletServiceImplmnt walletServiceImplmnt = new WalletServiceImplmnt();
+    WalletServiceImpl walletServiceImpl = new WalletServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -23,7 +23,7 @@ public class TransactionController extends HttpServlet {
         try{
             long userId = Long.parseLong(request.getParameter("userId"));
 
-            List<Transaction> txs = walletServiceImplmnt.getTransactionHistory(userId);
+            List<Transaction> txs = walletServiceImpl.getTransactionHistory(userId);
 
             PrintWriter pw = response.getWriter();
             for(Transaction t : txs){

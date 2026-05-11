@@ -9,11 +9,11 @@ import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.math.BigDecimal;
 
-import com.wallet.service.WalletServiceImplmnt;
+import com.wallet.service.WalletServiceImpl;
 
 @WebServlet("/transfer")
 public class TransferController extends HttpServlet {
-    private WalletServiceImplmnt walletServiceImplmnt = new WalletServiceImplmnt();
+    private WalletServiceImpl walletServiceImpl = new WalletServiceImpl();
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -21,7 +21,7 @@ public class TransferController extends HttpServlet {
             long senderId = Long.parseLong(request.getParameter("senderId"));
             long receiverId = Long.parseLong(request.getParameter("receiverId"));
             BigDecimal amount = new BigDecimal(request.getParameter("amount"));
-            walletServiceImplmnt.transfer(senderId, receiverId, amount);
+            walletServiceImpl.transfer(senderId, receiverId, amount);
 
             response.getWriter().println("Transfer Successful!");
         } catch (Exception e) {

@@ -2,6 +2,8 @@ package com.wallet.service;
 
 import com.wallet.dto.LoginRequestDto;
 import com.wallet.dto.RegisterRequestDto;
+import com.wallet.exception.InvalidCredentialsException;
+import com.wallet.exception.UserNotFoundException;
 import com.wallet.repository.UserRepository;
 import com.wallet.repository.WalletRepository;
 import com.wallet.model.User;
@@ -11,8 +13,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class UserServiceImpl implements UserService{
-    private UserRepository userDao = new UserRepository();
-    private WalletRepository walletDao = new WalletRepository();
+    private UserRepository userRepository = new UserRepository();
+    private WalletRepository walletRepository = new WalletRepository();
 
     public void register(RegisterRequestDto dto) throws SQLException, ClassNotFoundException {
 
@@ -26,8 +28,8 @@ public class UserServiceImpl implements UserService{
         try{
             conn.setAutoCommit(false);
 
-            long userId = userDao.createUser(conn, user);
-            walletDao.createWallet(conn, userId);
+            long userId = userRepository.createUser(conn, user);
+            walletRepository.createWallet(conn, userId);
             conn.commit();
         } catch (Exception e){
             conn.rollback();
@@ -40,13 +42,13 @@ public class UserServiceImpl implements UserService{
     public User login(LoginRequestDto dto) throws SQLException, ClassNotFoundException {
 
         try (Connection conn = DBConnection.getConnection()) {
-            User user = userDao.findUserByEmail(conn, dto.getEmail());
+            User user = userRepository.findUserByEmail(conn, dto.getEmail());
 
             if (user == null) {
-                throw new RuntimeException("User not Found");
+                throw new UserNotFoundException("User not found");
             }
             if (!user.getPassword().equals(dto.getPassword())) {
-                throw new RuntimeException("Invalid Password");
+                throw new InvalidCredentialsException("Invalid password");
             }
 
             return user;

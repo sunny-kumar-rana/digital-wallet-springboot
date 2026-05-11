@@ -1,5 +1,7 @@
 package com.wallet.service;
 
+import com.wallet.exception.InsufficientBalanceException;
+import com.wallet.exception.WalletNotFoundException;
 import com.wallet.repository.TransactionRepository;
 import com.wallet.repository.WalletRepository;
 import com.wallet.model.Transaction;
@@ -12,8 +14,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class WalletServiceImpl implements WalletService{
-    private WalletRepository walletDao = new WalletRepository();
-    private TransactionRepository transactionDao = new TransactionRepository();
+    private WalletRepository walletRepository = new WalletRepository();
+    private TransactionRepository transactionRepository = new TransactionRepository();
 
     public void transfer(long senderId, long receiverId, BigDecimal amount) throws SQLException, ClassNotFoundException {
         Connection conn = DBConnection.getConnection();
@@ -21,16 +23,24 @@ public class WalletServiceImpl implements WalletService{
         try{
             conn.setAutoCommit(false);
 
-            Wallet sender = walletDao.findByUserIdForUpdate(conn,senderId);
-            Wallet receiver = walletDao.findByUserIdForUpdate(conn,receiverId);
+            Wallet sender = walletRepository.findByUserIdForUpdate(conn,senderId);
+            Wallet receiver = walletRepository.findByUserIdForUpdate(conn,receiverId);
+
+            if(sender == null){
+                throw new WalletNotFoundException("Sender wallet not found");
+            }
+
+            if(receiver == null){
+                throw new WalletNotFoundException("Receiver wallet not found");
+            }
 
             if(sender.getBalance().compareTo(amount) < 0){
-                throw new RuntimeException("Insufficient Balance!");
+                throw new InsufficientBalanceException("Insufficient balance");
             }
-            walletDao.updateBalance(conn, senderId, sender.getBalance().subtract(amount));
-            walletDao.updateBalance(conn, receiverId, receiver.getBalance().add(amount));
+            walletRepository.updateBalance(conn, senderId, sender.getBalance().subtract(amount));
+            walletRepository.updateBalance(conn, receiverId, receiver.getBalance().add(amount));
 
-            transactionDao.createTransaction(conn, senderId, receiverId, amount, "SUCCESS");
+            transactionRepository.createTransaction(conn, senderId, receiverId, amount, "SUCCESS");
             conn.commit();
 
         } catch (Exception e) {
@@ -46,10 +56,10 @@ public class WalletServiceImpl implements WalletService{
         Connection conn = DBConnection.getConnection();
 
         try{
-            Wallet wallet = walletDao.findByUserId(conn, userId);
+            Wallet wallet = walletRepository.findByUserId(conn, userId);
 
             if (wallet == null){
-                throw new RuntimeException("Wallet not Found");
+                throw new WalletNotFoundException("Wallet not found");
             }
 
             return wallet.getBalance();
@@ -65,7 +75,7 @@ public class WalletServiceImpl implements WalletService{
         Connection conn = DBConnection.getConnection();
 
         try{
-            return transactionDao.findByUser(conn, userId);
+            return transactionRepository.findByUser(conn, userId);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {

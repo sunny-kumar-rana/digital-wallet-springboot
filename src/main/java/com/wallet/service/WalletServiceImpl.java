@@ -18,6 +18,15 @@ public class WalletServiceImpl implements WalletService{
     private TransactionRepository transactionRepository = new TransactionRepository();
 
     public void transfer(long senderId, long receiverId, BigDecimal amount) throws SQLException, ClassNotFoundException {
+
+        if(amount.compareTo(BigDecimal.ZERO) <= 0){
+            throw new IllegalArgumentException("Amount must be greater than zero");
+        }
+
+        if(senderId == receiverId){
+            throw new IllegalArgumentException("Sender and receiver cannot be same");
+        }
+
         Connection conn = DBConnection.getConnection();
 
         try{

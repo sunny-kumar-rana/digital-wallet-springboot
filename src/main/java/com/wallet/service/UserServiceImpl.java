@@ -18,6 +18,25 @@ public class UserServiceImpl implements UserService{
 
     public void register(RegisterRequestDto dto) throws SQLException, ClassNotFoundException {
 
+        if(dto.getName() == null || dto.getName().trim().isEmpty()){
+            throw new IllegalArgumentException("Name cannot be empty");
+        }
+
+        if(dto.getEmail() == null || dto.getEmail().trim().isEmpty()){
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+
+        if(!dto.getEmail().contains("@")){
+            throw new IllegalArgumentException("Invalid email format");
+        }
+
+        if(dto.getPassword() == null || dto.getPassword().trim().isEmpty()){
+            throw new IllegalArgumentException("Password cannot be empty");
+        }
+        if(dto.getPassword().length() < 4){
+            throw new IllegalArgumentException("Password must be at least 4 characters");
+        }
+
         User user = new User();
 
         user.setName(dto.getName());
@@ -27,6 +46,12 @@ public class UserServiceImpl implements UserService{
 
         try{
             conn.setAutoCommit(false);
+
+            User existingUser = userRepository.findUserByEmail(conn, dto.getEmail());
+
+            if(existingUser != null){
+                throw new IllegalArgumentException("Email already registered");
+            }
 
             long userId = userRepository.createUser(conn, user);
             walletRepository.createWallet(conn, userId);

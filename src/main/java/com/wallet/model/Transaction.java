@@ -55,4 +55,16 @@ public class Transaction {
     public void setCreatedAt(LocalDateTime createdAt){
         this.createdAt = createdAt;
     }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "id=" + id +
+                ", senderId=" + senderId +
+                ", receiverId=" + receiverId +
+                ", amount=" + amount +
+                ", status='" + status + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }

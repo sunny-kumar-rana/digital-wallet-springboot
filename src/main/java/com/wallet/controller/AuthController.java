@@ -19,6 +19,7 @@ public class AuthController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/plain");
 
         try{
 
@@ -34,7 +35,8 @@ public class AuthController extends HttpServlet {
             response.getWriter().println("Login Successful");
 
         } catch (Exception e) {
-            response.getWriter().println(e);
+            response.setContentType("text/plain");
+            response.getWriter().println(e.getMessage());
         }
 
     }

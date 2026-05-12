@@ -19,6 +19,7 @@ public class TransactionController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/plain");
 
         try{
             long userId = Long.parseLong(request.getParameter("userId"));
@@ -28,16 +29,18 @@ public class TransactionController extends HttpServlet {
             PrintWriter pw = response.getWriter();
             for(Transaction t : txs){
 
-                pw.println(
-                        "Transaction ID : " + t.getId() +
-                        "From : " + t.getSenderId() +
-                        "To : " + t.getReceiverId() +
-                        "Amount : " + t.getAmount()
-                );
+                pw.println("----------------------------");
+                pw.println("Transaction ID : " + t.getId());
+                pw.println("Sender ID      : " + t.getSenderId());
+                pw.println("Receiver ID    : " + t.getReceiverId());
+                pw.println("Amount         : " + t.getAmount());
+                pw.println("Status         : " + t.getStatus());
+                pw.println("Created At     : " + t.getCreatedAt());
 
             }
         } catch (Exception e) {
-            response.getWriter().println(e);
+            response.setContentType("text/plain");
+            response.getWriter().println(e.getMessage());
         }
     }
 }

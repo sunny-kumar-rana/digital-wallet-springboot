@@ -1,5 +1,6 @@
 package com.wallet.controller;
 
+import com.wallet.dto.TransferRequestDto;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,19 +16,33 @@ import com.wallet.service.WalletServiceImpl;
 public class TransferController extends HttpServlet {
     private WalletServiceImpl walletServiceImpl = new WalletServiceImpl();
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException{
+        response.setContentType("text/plain");
 
         try{
-            long senderId = Long.parseLong(request.getParameter("senderId"));
-            long receiverId = Long.parseLong(request.getParameter("receiverId"));
-            BigDecimal amount = new BigDecimal(request.getParameter("amount"));
-            walletServiceImpl.transfer(senderId, receiverId, amount);
+            TransferRequestDto dto = new TransferRequestDto();
+
+            dto.setSenderId(Long.parseLong(request.getParameter("senderId")));
+            dto.setReceiverId(Long.parseLong(request.getParameter("receiverId")));
+            dto.setAmount(new BigDecimal(request.getParameter("amount")));
+
+            if(dto.getSenderId() == dto.getReceiverId()){
+                response.getWriter().println("Sender and receiver cannot be same");
+                return;
+            }
+
+            walletServiceImpl.transfer(
+                    dto.getSenderId(),
+                    dto.getReceiverId(),
+                    dto.getAmount()
+            );
 
             response.getWriter().println("Transfer Successful!");
         } catch (Exception e) {
-            response.setContentType("text/plain");
 
-            e.printStackTrace(response.getWriter());
+            response.setContentType("text/plain");
+            response.getWriter().println(e.getMessage());
+
         }
     }
 }

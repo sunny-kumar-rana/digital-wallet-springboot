@@ -18,6 +18,8 @@ public class RegistrationController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/plain");
+
         try{
             RegisterRequestDto dto = new RegisterRequestDto();
 
@@ -31,7 +33,10 @@ public class RegistrationController extends HttpServlet {
             pw.println("User Registered Successfully");
 
         } catch (SQLException e) {
-            e.printStackTrace(response.getWriter());
+
+            response.setContentType("text/plain");
+            response.getWriter().println(e.getMessage());
+
         } catch (ClassNotFoundException e) {
             System.out.println(e);;
         }

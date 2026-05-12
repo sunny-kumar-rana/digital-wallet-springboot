@@ -47,6 +47,7 @@ public class TransactionRepository {
             tsx.setReceiverId(rs.getLong("receiver_id"));
             tsx.setAmount(rs.getBigDecimal("amount"));
             tsx.setStatus(rs.getString("status"));
+            tsx.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
 
             transactions.add(tsx);
         }

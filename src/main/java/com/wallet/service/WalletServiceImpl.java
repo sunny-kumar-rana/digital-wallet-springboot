@@ -7,12 +7,14 @@ import com.wallet.repository.WalletRepository;
 import com.wallet.model.Transaction;
 import com.wallet.model.Wallet;
 import com.wallet.util.DBConnection;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
+@Service
 public class WalletServiceImpl implements WalletService{
     private WalletRepository walletRepository = new WalletRepository();
     private TransactionRepository transactionRepository = new TransactionRepository();

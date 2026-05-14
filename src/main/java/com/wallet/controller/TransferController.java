@@ -1,48 +1,38 @@
 package com.wallet.controller;
 
 import com.wallet.dto.TransferRequestDto;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.ServletException;
+import com.wallet.service.WalletService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.math.BigDecimal;
 
-import com.wallet.service.WalletServiceImpl;
+@RestController
+public class TransferController {
 
-@WebServlet("/transfer")
-public class TransferController extends HttpServlet {
-    private WalletServiceImpl walletServiceImpl = new WalletServiceImpl();
+    private final WalletService walletService;
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException{
-        response.setContentType("text/plain");
+    @Autowired
+    public TransferController(WalletService walletService) {
+        this.walletService = walletService;
+    }
+
+    @PostMapping("/transfer")
+    public String transfer(@RequestBody TransferRequestDto dto) {
 
         try{
-            TransferRequestDto dto = new TransferRequestDto();
 
-            dto.setSenderId(Long.parseLong(request.getParameter("senderId")));
-            dto.setReceiverId(Long.parseLong(request.getParameter("receiverId")));
-            dto.setAmount(new BigDecimal(request.getParameter("amount")));
-
-            if(dto.getSenderId() == dto.getReceiverId()){
-                response.getWriter().println("Sender and receiver cannot be same");
-                return;
-            }
-
-            walletServiceImpl.transfer(
+            walletService.transfer(
                     dto.getSenderId(),
                     dto.getReceiverId(),
                     dto.getAmount()
             );
 
-            response.getWriter().println("Transfer Successful!");
-        } catch (Exception e) {
+            return "Transfer Successful";
 
-            response.setContentType("text/plain");
-            response.getWriter().println(e.getMessage());
-
+        } catch (Exception e){
+            return e.getMessage();
         }
     }
 }

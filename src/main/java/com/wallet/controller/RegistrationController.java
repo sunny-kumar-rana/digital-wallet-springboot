@@ -1,44 +1,37 @@
 package com.wallet.controller;
 
-import com.wallet.service.UserServiceImpl;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.wallet.service.UserService;
+
+import com.wallet.service.WalletService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.wallet.dto.RegisterRequestDto;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
 
-@WebServlet("/register")
-public class RegistrationController extends HttpServlet {
-    private UserServiceImpl userServiceImpl = new UserServiceImpl();
+@RestController
+public class RegistrationController {
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/plain");
+    private final UserService userService;
+
+    @Autowired
+    public RegistrationController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @PostMapping("/register")
+    public String register(@RequestBody RegisterRequestDto dto) {
 
         try{
-            RegisterRequestDto dto = new RegisterRequestDto();
 
-            dto.setName(request.getParameter("name"));
-            dto.setEmail(request.getParameter("email"));
-            dto.setPassword(request.getParameter("password"));
+            userService.register(dto);
 
-            userServiceImpl.register(dto);
+            return "User Registered Successfully";
 
-            PrintWriter pw = response.getWriter();
-            pw.println("User Registered Successfully");
-
-        } catch (SQLException e) {
-
-            response.setContentType("text/plain");
-            response.getWriter().println(e.getMessage());
-
-        } catch (ClassNotFoundException e) {
-            System.out.println(e);;
+        } catch (Exception e){
+            return e.getMessage();
         }
     }
 }

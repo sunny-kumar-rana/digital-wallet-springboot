@@ -1,46 +1,35 @@
 package com.wallet.controller;
 
 import com.wallet.model.Transaction;
-import com.wallet.service.WalletServiceImpl;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.wallet.service.WalletService;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
 
 
-@WebServlet("/transactions")
-public class TransactionController extends HttpServlet {
+@RestController
+public class TransactionController {
 
-    WalletServiceImpl walletServiceImpl = new WalletServiceImpl();
+    private WalletService walletService;
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/plain");
+    @Autowired
+    public TransactionController(WalletService walletService){
+        this.walletService = walletService;
+    }
+
+    @GetMapping("/transactions")
+    public List<Transaction> getTransactions(@RequestParam long userId) {
 
         try{
-            long userId = Long.parseLong(request.getParameter("userId"));
 
-            List<Transaction> txs = walletServiceImpl.getTransactionHistory(userId);
+            return walletService.getTransactionHistory(userId);
 
-            PrintWriter pw = response.getWriter();
-            for(Transaction t : txs){
-
-                pw.println("----------------------------");
-                pw.println("Transaction ID : " + t.getId());
-                pw.println("Sender ID      : " + t.getSenderId());
-                pw.println("Receiver ID    : " + t.getReceiverId());
-                pw.println("Amount         : " + t.getAmount());
-                pw.println("Status         : " + t.getStatus());
-                pw.println("Created At     : " + t.getCreatedAt());
-
-            }
-        } catch (Exception e) {
-            response.setContentType("text/plain");
-            response.getWriter().println(e.getMessage());
+        } catch (Exception e){
+            throw new RuntimeException(e);
         }
     }
 }

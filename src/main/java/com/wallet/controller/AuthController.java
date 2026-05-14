@@ -2,42 +2,31 @@ package com.wallet.controller;
 
 import com.wallet.dto.LoginRequestDto;
 import com.wallet.model.User;
-import com.wallet.service.UserServiceImpl;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import com.wallet.service.UserService;
 
-import java.io.IOException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 
-@WebServlet("/login")
-public class AuthController extends HttpServlet {
 
-    UserServiceImpl userServiceImpl = new UserServiceImpl();
+@RestController
+public class AuthController {
+    @Autowired
+    UserService userService;
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/plain");
+    @PostMapping("/login")
+    public String login(@RequestBody LoginRequestDto dto) {
 
         try{
 
-            LoginRequestDto dto = new LoginRequestDto();
+            User user = userService.login(dto);
 
-            dto.setEmail(request.getParameter("email"));
-            dto.setPassword(request.getParameter("password"));
+            return "Login Successful : " + user.getName();
 
-            User user = userServiceImpl.login(dto);
-
-            HttpSession session = request.getSession(true);
-            session.setAttribute("userId", user.getId());
-            response.getWriter().println("Login Successful");
-
-        } catch (Exception e) {
-            response.setContentType("text/plain");
-            response.getWriter().println(e.getMessage());
+        } catch (Exception e){
+            return e.getMessage();
         }
-
     }
 }

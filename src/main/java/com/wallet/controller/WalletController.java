@@ -1,39 +1,32 @@
 package com.wallet.controller;
 
 
-import com.wallet.service.WalletServiceImpl;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import com.wallet.service.WalletService;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.math.BigDecimal;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-@WebServlet("/balance")
-public class WalletController extends HttpServlet {
-    private WalletServiceImpl walletServiceImpl = new WalletServiceImpl();
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/plain");
+@RestController
+public class WalletController{
+
+    private final WalletService walletService;
+
+    @Autowired
+    public WalletController(WalletService walletService) {
+        this.walletService = walletService;
+    }
+
+    @GetMapping("/balance")
+    public String getBalance(@RequestParam long userId) {
 
         try{
-            HttpSession session = request.getSession(false);
-            if(session == null){
-                throw new RuntimeException("Not Logged In");
-            }
-            long userId = (Long) session.getAttribute("userId");
-            BigDecimal balance = walletServiceImpl.getBalance(userId);
+            return "Balance = " + walletService.getBalance(userId);
 
-            PrintWriter pw = response.getWriter();
-            pw.println("Balance = " + balance);
-
-        } catch (Exception e) {
-            response.setContentType("text/plain");
-            response.getWriter().println(e.getMessage());
+        } catch (Exception e){
+            return e.getMessage();
         }
-
     }
 }

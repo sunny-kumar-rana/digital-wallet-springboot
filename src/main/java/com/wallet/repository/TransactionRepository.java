@@ -1,6 +1,7 @@
 package com.wallet.repository;
 
 import com.wallet.model.Transaction;
+import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -11,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class TransactionRepository {
 
     public void createTransaction(Connection conn, long senderId, long receiverId, BigDecimal amount, String status) throws SQLException {

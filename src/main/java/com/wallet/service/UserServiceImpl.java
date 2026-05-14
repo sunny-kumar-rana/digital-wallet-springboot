@@ -8,6 +8,7 @@ import com.wallet.repository.UserRepository;
 import com.wallet.repository.WalletRepository;
 import com.wallet.model.User;
 import com.wallet.util.DBConnection;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
@@ -16,8 +17,16 @@ import java.sql.SQLException;
 
 @Service
 public class UserServiceImpl implements UserService{
-    private UserRepository userRepository = new UserRepository();
-    private WalletRepository walletRepository = new WalletRepository();
+    private final UserRepository userRepository;
+    private final WalletRepository walletRepository;
+
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository,
+                           WalletRepository walletRepository) {
+
+        this.userRepository = userRepository;
+        this.walletRepository = walletRepository;
+    }
 
     public void register(RegisterRequestDto dto) throws SQLException, ClassNotFoundException {
 

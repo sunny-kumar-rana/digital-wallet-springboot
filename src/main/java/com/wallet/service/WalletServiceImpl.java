@@ -7,6 +7,7 @@ import com.wallet.repository.WalletRepository;
 import com.wallet.model.Transaction;
 import com.wallet.model.Wallet;
 import com.wallet.util.DBConnection;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,8 +17,16 @@ import java.util.List;
 
 @Service
 public class WalletServiceImpl implements WalletService{
-    private WalletRepository walletRepository = new WalletRepository();
-    private TransactionRepository transactionRepository = new TransactionRepository();
+    private final WalletRepository walletRepository;
+    private final TransactionRepository transactionRepository;
+
+    @Autowired
+    public WalletServiceImpl(WalletRepository walletRepository,
+                             TransactionRepository transactionRepository) {
+
+        this.walletRepository = walletRepository;
+        this.transactionRepository = transactionRepository;
+    }
 
     public void transfer(long senderId, long receiverId, BigDecimal amount) throws SQLException, ClassNotFoundException {
 

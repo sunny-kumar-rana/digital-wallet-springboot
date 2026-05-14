@@ -1,6 +1,8 @@
 package com.wallet.repository;
 
 import com.wallet.model.Wallet;
+import org.springframework.stereotype.Repository;
+
 import java.math.BigDecimal;
 
 import java.sql.Connection;
@@ -8,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+@Repository
 public class WalletRepository {
     public Wallet findByUserId(Connection conn, long userId) throws Exception{
         String query = "SELECT user_id, balance FROM wallets WHERE user_id = ?";

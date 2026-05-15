@@ -1,14 +1,29 @@
 package com.wallet.model;
 
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "transactions")
 public class Transaction {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Column(name = "sender_id", nullable = false)
     private long senderId;
+
+    @Column(name = "receiver_id", nullable = false)
     private long receiverId;
+
+    @Column(nullable = false)
     private BigDecimal amount;
+
+    @Column(nullable = false)
     private String status;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     public Transaction(){}

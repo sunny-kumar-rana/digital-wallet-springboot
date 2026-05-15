@@ -1,9 +1,16 @@
 package com.wallet.model;
 
 import java.math.BigDecimal;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "wallets")
 public class Wallet {
+    @Id
+    @Column(name = "user_id")
     private long userId;
+
+    @Column(nullable = false)
     private BigDecimal balance;
 
     public Wallet(){}

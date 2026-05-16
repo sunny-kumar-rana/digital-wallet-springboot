@@ -4,19 +4,18 @@ import com.wallet.dto.LoginRequestDto;
 import com.wallet.dto.RegisterRequestDto;
 import com.wallet.exception.InvalidCredentialsException;
 import com.wallet.exception.UserNotFoundException;
+import com.wallet.model.User;
+import com.wallet.model.Wallet;
 import com.wallet.repository.UserRepository;
 import com.wallet.repository.WalletRepository;
-import com.wallet.model.User;
-import com.wallet.util.DBConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
+import java.math.BigDecimal;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
     private final WalletRepository walletRepository;
 
@@ -28,7 +27,8 @@ public class UserServiceImpl implements UserService{
         this.walletRepository = walletRepository;
     }
 
-    public void register(RegisterRequestDto dto) throws SQLException, ClassNotFoundException {
+    @Override
+    public void register(RegisterRequestDto dto) {
 
         if(dto.getName() == null || dto.getName().trim().isEmpty()){
             throw new IllegalArgumentException("Name cannot be empty");
@@ -45,8 +45,15 @@ public class UserServiceImpl implements UserService{
         if(dto.getPassword() == null || dto.getPassword().trim().isEmpty()){
             throw new IllegalArgumentException("Password cannot be empty");
         }
+
         if(dto.getPassword().length() < 4){
             throw new IllegalArgumentException("Password must be at least 4 characters");
+        }
+
+        User existingUser = userRepository.findByEmail(dto.getEmail());
+
+        if(existingUser != null){
+            throw new IllegalArgumentException("Email already registered");
         }
 
         User user = new User();
@@ -54,41 +61,30 @@ public class UserServiceImpl implements UserService{
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setPassword(dto.getPassword());
-        Connection conn = DBConnection.getConnection();
 
-        try{
-            conn.setAutoCommit(false);
+        User savedUser = userRepository.save(user);
 
-            User existingUser = userRepository.findUserByEmail(conn, dto.getEmail());
+        Wallet wallet = new Wallet();
 
-            if(existingUser != null){
-                throw new IllegalArgumentException("Email already registered");
-            }
+        wallet.setUserId(savedUser.getId());
+        wallet.setBalance(BigDecimal.ZERO);
 
-            long userId = userRepository.createUser(conn, user);
-            walletRepository.createWallet(conn, userId);
-            conn.commit();
-        } catch (Exception e){
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.close();
-        }
+        walletRepository.save(wallet);
     }
 
-    public User login(LoginRequestDto dto) throws SQLException, ClassNotFoundException {
+    @Override
+    public User login(LoginRequestDto dto) {
 
-        try (Connection conn = DBConnection.getConnection()) {
-            User user = userRepository.findUserByEmail(conn, dto.getEmail());
+        User user = userRepository.findByEmail(dto.getEmail());
 
-            if (user == null) {
-                throw new UserNotFoundException("User not found");
-            }
-            if (!user.getPassword().equals(dto.getPassword())) {
-                throw new InvalidCredentialsException("Invalid password");
-            }
-
-            return user;
+        if(user == null){
+            throw new UserNotFoundException("User not found");
         }
+
+        if(!user.getPassword().equals(dto.getPassword())){
+            throw new InvalidCredentialsException("Invalid password");
+        }
+
+        return user;
     }
 }

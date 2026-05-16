@@ -2,21 +2,20 @@ package com.wallet.service;
 
 import com.wallet.exception.InsufficientBalanceException;
 import com.wallet.exception.WalletNotFoundException;
-import com.wallet.repository.TransactionRepository;
-import com.wallet.repository.WalletRepository;
 import com.wallet.model.Transaction;
 import com.wallet.model.Wallet;
-import com.wallet.util.DBConnection;
+import com.wallet.repository.TransactionRepository;
+import com.wallet.repository.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 @Service
-public class WalletServiceImpl implements WalletService{
+public class WalletServiceImpl implements WalletService {
+
     private final WalletRepository walletRepository;
     private final TransactionRepository transactionRepository;
 
@@ -28,7 +27,9 @@ public class WalletServiceImpl implements WalletService{
         this.transactionRepository = transactionRepository;
     }
 
-    public void transfer(long senderId, long receiverId, BigDecimal amount) throws SQLException, ClassNotFoundException {
+    @Override
+    @Transactional
+    public void transfer(long senderId, long receiverId, BigDecimal amount) {
 
         if(amount.compareTo(BigDecimal.ZERO) <= 0){
             throw new IllegalArgumentException("Amount must be greater than zero");
@@ -38,69 +39,51 @@ public class WalletServiceImpl implements WalletService{
             throw new IllegalArgumentException("Sender and receiver cannot be same");
         }
 
-        Connection conn = DBConnection.getConnection();
+        Wallet sender = walletRepository.findById(senderId)
+                .orElseThrow(() ->
+                        new WalletNotFoundException("Sender wallet not found"));
 
-        try{
-            conn.setAutoCommit(false);
+        Wallet receiver = walletRepository.findById(receiverId)
+                .orElseThrow(() ->
+                        new WalletNotFoundException("Receiver wallet not found"));
 
-            Wallet sender = walletRepository.findByUserIdForUpdate(conn,senderId);
-            Wallet receiver = walletRepository.findByUserIdForUpdate(conn,receiverId);
-
-            if(sender == null){
-                throw new WalletNotFoundException("Sender wallet not found");
-            }
-
-            if(receiver == null){
-                throw new WalletNotFoundException("Receiver wallet not found");
-            }
-
-            if(sender.getBalance().compareTo(amount) < 0){
-                throw new InsufficientBalanceException("Insufficient balance");
-            }
-            walletRepository.updateBalance(conn, senderId, sender.getBalance().subtract(amount));
-            walletRepository.updateBalance(conn, receiverId, receiver.getBalance().add(amount));
-
-            transactionRepository.createTransaction(conn, senderId, receiverId, amount, "SUCCESS");
-            conn.commit();
-
-        } catch (Exception e) {
-            conn.rollback();
-            throw new RuntimeException(e);
+        if(sender.getBalance().compareTo(amount) < 0){
+            throw new InsufficientBalanceException("Insufficient balance");
         }
-        finally {
-            conn.close();
-        }
+
+        sender.setBalance(sender.getBalance().subtract(amount));
+        receiver.setBalance(receiver.getBalance().add(amount));
+
+        walletRepository.save(sender);
+        walletRepository.save(receiver);
+
+        Transaction transaction = new Transaction();
+
+        transaction.setSenderId(senderId);
+        transaction.setReceiverId(receiverId);
+        transaction.setAmount(amount);
+        transaction.setStatus("SUCCESS");
+
+        transactionRepository.save(transaction);
     }
 
-    public BigDecimal getBalance(long userId) throws SQLException, ClassNotFoundException {
-        Connection conn = DBConnection.getConnection();
+    @Override
+    public BigDecimal getBalance(long userId) {
 
-        try{
-            Wallet wallet = walletRepository.findByUserId(conn, userId);
+        Wallet wallet = walletRepository.findById(userId)
+                .orElseThrow(() ->
+                        new WalletNotFoundException("Wallet not found"));
 
-            if (wallet == null){
-                throw new WalletNotFoundException("Wallet not found");
-            }
-
-            return wallet.getBalance();
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            conn.close();
-        }
+        return wallet.getBalance();
     }
 
-    public List<Transaction> getTransactionHistory(long userId) throws ClassNotFoundException, SQLException {
-        Connection conn = DBConnection.getConnection();
+    @Override
+    public List<Transaction> getTransactionHistory(long userId) {
 
-        try{
-            return transactionRepository.findByUser(conn, userId);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            conn.close();
-        }
-
+        return transactionRepository
+                .findBySenderIdOrReceiverIdOrderByCreatedAtDesc(
+                        userId,
+                        userId
+                );
     }
 }

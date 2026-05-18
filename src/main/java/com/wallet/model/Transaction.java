@@ -1,6 +1,8 @@
 package com.wallet.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -23,7 +25,8 @@ public class Transaction {
     @Column(nullable = false)
     private String status;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     public Transaction(){}

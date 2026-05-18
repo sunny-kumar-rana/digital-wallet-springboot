@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 
 @RestController
 public class TransferController {
@@ -19,7 +21,7 @@ public class TransferController {
     }
 
     @PostMapping("/transfer")
-    public String transfer(@RequestBody TransferRequestDto dto) {
+    public Map<String, String> transfer(@RequestBody TransferRequestDto dto) {
 
         try{
 
@@ -29,10 +31,14 @@ public class TransferController {
                     dto.getAmount()
             );
 
-            return "Transfer Successful";
+            return Map.of(
+                    "message", "Transfer Successful"
+            );
 
         } catch (Exception e){
-            return e.getMessage();
+            return Map.of(
+                    "error", e.getMessage()
+            );
         }
     }
 }

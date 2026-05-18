@@ -25,18 +25,10 @@ public class RegistrationController {
     @PostMapping("/register")
     public Map<String, String> register(@RequestBody RegisterRequestDto dto) {
 
-        try{
+        userService.register(dto);
 
-            userService.register(dto);
-
-            return Map.of(
-                    "message", "User Registered Successfully"
-            );
-
-        } catch (Exception e){
-            return Map.of(
-                    "error", e.getMessage()
-            );
-        }
+        return Map.of(
+                "message", "User Registered Successfully"
+        );
     }
 }

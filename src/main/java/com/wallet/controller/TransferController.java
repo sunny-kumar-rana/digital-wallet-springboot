@@ -23,22 +23,15 @@ public class TransferController {
     @PostMapping("/transfer")
     public Map<String, String> transfer(@RequestBody TransferRequestDto dto) {
 
-        try{
 
-            walletService.transfer(
-                    dto.getSenderId(),
-                    dto.getReceiverId(),
-                    dto.getAmount()
-            );
+        walletService.transfer(
+                dto.getSenderId(),
+                dto.getReceiverId(),
+                dto.getAmount()
+        );
 
-            return Map.of(
-                    "message", "Transfer Successful"
-            );
-
-        } catch (Exception e){
-            return Map.of(
-                    "error", e.getMessage()
-            );
-        }
+        return Map.of(
+                "message", "Transfer Successful"
+        );
     }
 }

@@ -24,16 +24,10 @@ public class WalletController{
     @GetMapping("/balance")
     public Map<String, Object> getBalance(@RequestParam long userId) {
 
-        try{
-            return Map.of(
-                    "userId", userId,
-                    "balance", walletService.getBalance(userId)
-            );
+        return Map.of(
+                "userId", userId,
+                "balance", walletService.getBalance(userId)
+        );
 
-        } catch (Exception e){
-            return Map.of(
-                    "error", e.getMessage()
-            );
-        }
     }
 }

@@ -14,26 +14,23 @@ import java.util.Map;
 
 @RestController
 public class AuthController {
+    private final UserService userService;
+
     @Autowired
-    UserService userService;
+    public AuthController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("/login")
     public Map<String, Object> login(@RequestBody LoginRequestDto dto) {
 
-        try{
+        User user = userService.login(dto);
 
-            User user = userService.login(dto);
+        return Map.of(
+                "message", "Login Successful",
+                "userId", user.getId(),
+                "name", user.getName()
+        );
 
-            return Map.of(
-                    "message", "Login Successful",
-                    "userId", user.getId(),
-                    "name", user.getName()
-            );
-
-        } catch (Exception e){
-            return Map.of(
-                    "error", e.getMessage()
-            );
-        }
     }
 }

@@ -24,12 +24,6 @@ public class TransactionController {
     @GetMapping("/transactions")
     public List<Transaction> getTransactions(@RequestParam long userId) {
 
-        try{
-
-            return walletService.getTransactionHistory(userId);
-
-        } catch (Exception e){
-            throw new RuntimeException(e);
-        }
+        return walletService.getTransactionHistory(userId);
     }
 }

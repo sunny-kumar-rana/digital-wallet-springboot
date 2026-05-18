@@ -2,13 +2,14 @@ package com.wallet.controller;
 
 import com.wallet.service.UserService;
 
-import com.wallet.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wallet.dto.RegisterRequestDto;
+
+import java.util.Map;
 
 
 @RestController
@@ -22,16 +23,20 @@ public class RegistrationController {
     }
 
     @PostMapping("/register")
-    public String register(@RequestBody RegisterRequestDto dto) {
+    public Map<String, String> register(@RequestBody RegisterRequestDto dto) {
 
         try{
 
             userService.register(dto);
 
-            return "User Registered Successfully";
+            return Map.of(
+                    "message", "User Registered Successfully"
+            );
 
         } catch (Exception e){
-            return e.getMessage();
+            return Map.of(
+                    "error", e.getMessage()
+            );
         }
     }
 }

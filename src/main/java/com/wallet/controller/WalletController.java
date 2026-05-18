@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 
 @RestController
 public class WalletController{
@@ -20,13 +22,18 @@ public class WalletController{
     }
 
     @GetMapping("/balance")
-    public String getBalance(@RequestParam long userId) {
+    public Map<String, Object> getBalance(@RequestParam long userId) {
 
         try{
-            return "Balance = " + walletService.getBalance(userId);
+            return Map.of(
+                    "userId", userId,
+                    "balance", walletService.getBalance(userId)
+            );
 
         } catch (Exception e){
-            return e.getMessage();
+            return Map.of(
+                    "error", e.getMessage()
+            );
         }
     }
 }

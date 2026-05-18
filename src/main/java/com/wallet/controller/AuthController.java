@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
 
 
 @RestController
@@ -17,16 +18,22 @@ public class AuthController {
     UserService userService;
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequestDto dto) {
+    public Map<String, Object> login(@RequestBody LoginRequestDto dto) {
 
         try{
 
             User user = userService.login(dto);
 
-            return "Login Successful : " + user.getName();
+            return Map.of(
+                    "message", "Login Successful",
+                    "userId", user.getId(),
+                    "name", user.getName()
+            );
 
         } catch (Exception e){
-            return e.getMessage();
+            return Map.of(
+                    "error", e.getMessage()
+            );
         }
     }
 }

@@ -2,6 +2,7 @@ package com.wallet.controller;
 
 import com.wallet.service.UserService;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,7 +24,7 @@ public class RegistrationController {
     }
 
     @PostMapping("/register")
-    public Map<String, String> register(@RequestBody RegisterRequestDto dto) {
+    public Map<String, String> register(@Valid @RequestBody RegisterRequestDto dto) {
 
         userService.register(dto);
 

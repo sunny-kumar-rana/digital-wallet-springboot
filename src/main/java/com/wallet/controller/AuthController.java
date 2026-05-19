@@ -4,6 +4,7 @@ import com.wallet.dto.LoginRequestDto;
 import com.wallet.model.User;
 import com.wallet.service.UserService;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +23,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public Map<String, Object> login(@RequestBody LoginRequestDto dto) {
+    public Map<String, Object> login(@Valid @RequestBody LoginRequestDto dto) {
 
         User user = userService.login(dto);
 

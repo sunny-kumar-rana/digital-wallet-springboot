@@ -2,6 +2,7 @@ package com.wallet.controller;
 
 import com.wallet.dto.TransferRequestDto;
 import com.wallet.service.WalletService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +22,7 @@ public class TransferController {
     }
 
     @PostMapping("/transfer")
-    public Map<String, String> transfer(@RequestBody TransferRequestDto dto) {
+    public Map<String, String> transfer(@Valid @RequestBody TransferRequestDto dto) {
 
 
         walletService.transfer(

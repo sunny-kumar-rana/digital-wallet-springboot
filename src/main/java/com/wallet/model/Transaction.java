@@ -10,7 +10,12 @@ import java.time.LocalDateTime;
 @Table(name = "transactions")
 public class Transaction {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "transaction_seq_gen")
+    @SequenceGenerator(
+            name = "transaction_seq_gen",
+            sequenceName = "TRANSACTION_SEQ",
+            allocationSize = 1
+    )
     private long id;
 
     @Column(name = "sender_id", nullable = false)

@@ -12,4 +12,6 @@ public interface WalletService {
     BigDecimal getBalance(long userId);
 
     List<Transaction> getTransactionHistory(long userId);
+
+    void deposit(long userId, BigDecimal amount);
 }

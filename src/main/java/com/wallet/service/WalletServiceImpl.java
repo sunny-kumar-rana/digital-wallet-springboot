@@ -86,4 +86,36 @@ public class WalletServiceImpl implements WalletService {
                         userId
                 );
     }
+
+    @Override
+    @Transactional
+    public void deposit(long userId, BigDecimal amount) {
+
+        if(amount.compareTo(BigDecimal.ZERO) <= 0){
+            throw new IllegalArgumentException(
+                    "Amount must be greater than zero"
+            );
+        }
+
+        Wallet wallet = walletRepository.findById(userId)
+                .orElseThrow(() ->
+                        new WalletNotFoundException(
+                                "Wallet not found"
+                        ));
+
+        wallet.setBalance(
+                wallet.getBalance().add(amount)
+        );
+
+        walletRepository.save(wallet);
+
+        Transaction transaction = new Transaction();
+
+        transaction.setSenderId(userId);
+        transaction.setReceiverId(userId);
+        transaction.setAmount(amount);
+        transaction.setStatus("DEPOSIT");
+
+        transactionRepository.save(transaction);
+    }
 }

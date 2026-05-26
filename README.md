@@ -1,158 +1,111 @@
-# Digital Wallet - Spring Boot
+# Digital Wallet Backend
 
-A secure and scalable Digital Wallet application built using Spring Boot. The project provides wallet management, user authentication, money transfer, transaction handling, and RESTful APIs for digital payment operations.
+A full-stack digital wallet backend built using Spring Boot, Spring Data JPA, Hibernate, and Oracle Database.
 
-## Features
-
-- User Registration & Login
-- Wallet Creation and Management
-- Balance Inquiry
-- Add Money to Wallet
-- Transfer Money Between Users
-- Transaction History
-- Secure REST APIs
-- Exception Handling
-- Validation Support
-- Layered Architecture
-- Database Integration with JPA/Hibernate
+This backend provides REST APIs for:
+- User registration
+- User login
+- Wallet balance retrieval
+- Money transfer
+- Transaction history
 
 ---
 
-## Tech Stack
+# Tech Stack
 
-### Backend
 - Java
 - Spring Boot
-- Spring MVC
 - Spring Data JPA
 - Hibernate
-
-### Database
-- MySQL
-
-### Build Tool
+- Oracle Database
 - Maven
-
-### API Testing
-- Postman
+- REST APIs
 
 ---
 
-## Project Structure
+# Features Implemented
 
-```bash
-digital-wallet-springboot/
-│
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── wallet/
-│   │   │           ├── controller/
-│   │   │           ├── service/
-│   │   │           ├── repository/
-│   │   │           ├── model/
-│   │   │           ├── dto/
-│   │   │           ├── exception/
-│   │   │           └── config/
-│   │   │
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       └── data.sql
-│   │
-│   └── test/
-│
-├── pom.xml
-└── README.md
-```
+## Authentication
+- User Registration
+- User Login
+- DTO-based request handling
+- Global exception handling
 
 ---
 
-## Getting Started
-
-### Prerequisites
-
-Make sure the following are installed:
-
-- Java 17+ (or project compatible version)
-- Maven
-- MySQL
+## Wallet System
+- Automatic wallet creation during registration
+- Balance retrieval
+- Money transfer between users
+- Transaction history tracking
 
 ---
 
-## Installation
-
-### 1. Clone Repository
-
-```bash
-git clone https://github.com/sunny-kumar-rana/digital-wallet-springboot.git
-```
-
-### 2. Navigate to Project
-
-```bash
-cd digital-wallet-springboot
-```
-
-### 3. Configure Database
-
-Update `application.properties`:
-
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/digital_wallet
-spring.datasource.username=root
-spring.datasource.password=your_password
-
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-```
-
-### 4. Build Project
-
-```bash
-mvn clean install
-```
-
-### 5. Run Application
-
-```bash
-mvn spring-boot:run
-```
-
-Application starts on:
-
-```bash
-http://localhost:8080
-```
+## Backend Architecture
+- Layered architecture
+    - Controller Layer
+    - Service Layer
+    - Repository Layer
+- Dependency Injection
+- REST API architecture
+- DTO usage
+- Validation handling
+- Global exception handling
+- Transaction management using `@Transactional`
 
 ---
 
-## API Endpoints
+# Database Tables
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/users/register` | Register User |
-| POST | `/api/users/login` | User Login |
-| GET | `/api/wallet/{id}` | Get Wallet Details |
-| POST | `/api/wallet/add-money` | Add Money |
-| POST | `/api/wallet/transfer` | Transfer Money |
-| GET | `/api/transactions/{userId}` | Transaction History |
+## users
+Stores user information.
+
+## wallets
+Stores wallet balances linked to users.
+
+## transactions
+Stores transfer history.
 
 ---
 
-## Sample JSON Request
+# Current API Endpoints
 
-### Register User
+## Register User
+
+POST `/register`
 
 ```json
 {
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "password123"
+  "name": "Shubh",
+  "email": "shubh@gmail.com",
+  "password": "1234"
 }
 ```
 
-### Transfer Money
+---
+
+## Login User
+
+POST `/login`
+
+```json
+{
+  "email": "shubh@gmail.com",
+  "password": "1234"
+}
+```
+
+---
+
+## Get Balance
+
+GET `/balance?userId=1`
+
+---
+
+## Transfer Money
+
+POST `/transfer`
 
 ```json
 {
@@ -164,69 +117,118 @@ http://localhost:8080
 
 ---
 
+## Transaction History
+
+GET `/transactions?userId=1`
+
+---
+
+# Running the Backend
+
+## Prerequisites
+- Java 17+
+- Maven
+- Oracle Database
+
+---
+
+## Configure Database
+
+Update:
+
+`src/main/resources/application.properties`
+
+```properties
+spring.datasource.url=jdbc:oracle:thin:@localhost:1521:xe
+spring.datasource.username=wallet
+spring.datasource.password=Admin
+spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
+```
+
+---
+
+## Run Application
+
+```bash
+mvn spring-boot:run
+```
+
+Backend runs on:
+
+```text
+http://localhost:8080
+```
+
+---
+
+# Project Structure
+
+```text
+src/main/java/com/wallet
+│
+├── advice
+├── config
+├── controller
+├── dto
+├── exception
+├── model
+├── repository
+├── service
+└── DigitalWalletApplication.java
+```
+
+---
+
+# Current Limitations
+
+- No JWT authentication
+- No Spring Security
+- Plain text password storage
+- No refresh tokens
+- No role-based authorization
+- No deposit/withdraw functionality
+- No pagination
+- No API documentation
+- No unit/integration tests
+
+---
+
+# Future Plans
+
 ## Security
-
-- Password encryption
-- Input validation
-- Exception handling
-- Layered service architecture
-- Secure API design practices
+- Spring Security
+- JWT authentication
+- BCrypt password encryption
+- Protected routes
 
 ---
 
-## Future Improvements
-
-- JWT Authentication
-- Role-Based Access Control
-- Docker Support
-- Swagger/OpenAPI Documentation
-- Unit & Integration Testing
-- Email Notifications
-- Transaction Limits
-- Redis Caching
-- Microservices Architecture
+## Wallet Features
+- Deposit money
+- Withdraw money
+- Transaction categorization
+- Transaction status improvements
 
 ---
 
-## Testing
-
-Run tests using:
-
-```bash
-mvn test
-```
-
----
-
-## Deployment
-
-Generate JAR:
-
-```bash
-mvn clean package
-```
-
-Run JAR:
-
-```bash
-java -jar target/digital-wallet-springboot.jar
-```
+## Backend Improvements
+- Proper entity relationships
+- Response DTO standardization
+- API versioning
+- Swagger/OpenAPI documentation
+- Logging system
+- Audit system
+- Redis caching
 
 ---
 
-## Contributing
-
-1. Fork repository
-2. Create feature branch
-3. Commit changes
-4. Push branch
-5. Open Pull Request
+## DevOps
+- Docker support
+- CI/CD pipeline
+- Cloud deployment
 
 ---
 
-## Author
+# Status
 
-Sunny Kumar Rana
-
-GitHub:
-https://github.com/sunny-kumar-rana
+Backend is currently functional and integrated with the React frontend.

@@ -4,11 +4,9 @@ package com.wallet.controller;
 import com.wallet.service.WalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 
@@ -31,5 +29,22 @@ public class WalletController{
                 "balance", walletService.getBalance(userId)
         );
 
+    }
+
+    @PostMapping("/deposit")
+    public Map<String, String> deposit(
+            @RequestParam long userId,
+            @RequestParam double amount
+    ) {
+
+        walletService.deposit(
+                userId,
+                BigDecimal.valueOf(amount)
+        );
+
+        return Map.of(
+                "message",
+                "Deposit Successful"
+        );
     }
 }

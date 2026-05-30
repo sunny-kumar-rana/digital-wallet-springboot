@@ -47,4 +47,21 @@ public class WalletController{
                 "Deposit Successful"
         );
     }
+
+    @PostMapping("/withdraw")
+    public Map<String, String> withdraw(
+            @RequestParam long userId,
+            @RequestParam double amount
+    ) {
+
+        walletService.withdraw(
+                userId,
+                BigDecimal.valueOf(amount)
+        );
+
+        return Map.of(
+                "message",
+                "Withdrawal Successful"
+        );
+    }
 }

@@ -62,6 +62,7 @@ public class WalletServiceImpl implements WalletService {
         transaction.setSenderId(senderId);
         transaction.setReceiverId(receiverId);
         transaction.setAmount(amount);
+        transaction.setTransactionType("TRANSFER");
         transaction.setStatus("SUCCESS");
 
         transactionRepository.save(transaction);
@@ -114,7 +115,8 @@ public class WalletServiceImpl implements WalletService {
         transaction.setSenderId(userId);
         transaction.setReceiverId(userId);
         transaction.setAmount(amount);
-        transaction.setStatus("DEPOSIT");
+        transaction.setTransactionType("DEPOSIT");
+        transaction.setStatus("SUCCESS");
 
         transactionRepository.save(transaction);
     }
@@ -152,7 +154,8 @@ public class WalletServiceImpl implements WalletService {
         transaction.setSenderId(userId);
         transaction.setReceiverId(userId);
         transaction.setAmount(amount);
-        transaction.setStatus("WITHDRAW");
+        transaction.setTransactionType("WITHDRAW");
+        transaction.setStatus("SUCCESS");
 
         transactionRepository.save(transaction);
     }

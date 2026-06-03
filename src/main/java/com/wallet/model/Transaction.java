@@ -27,6 +27,9 @@ public class Transaction {
     @Column(nullable = false)
     private BigDecimal amount;
 
+    @Column(name = "transaction_type", nullable = false)
+    private String transactionType;
+
     @Column(nullable = false)
     private String status;
 
@@ -62,6 +65,12 @@ public class Transaction {
     }
     public BigDecimal getAmount(){
         return this.amount;
+    }
+    public String getTransactionType() {
+        return transactionType;
+    }
+    public void setTransactionType(String transactionType) {
+        this.transactionType = transactionType;
     }
     public void setAmount(BigDecimal amount){
         this.amount = amount;

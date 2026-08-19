@@ -27,7 +27,7 @@ public class Transaction {
     @Column(nullable = false)
     private BigDecimal amount;
 
-    @Column(name = "transaction_type", nullable = false)
+    @Column(name = "transaction_type", nullable = false, columnDefinition = "varchar2(255 char) default 'STANDARD'")
     private String transactionType;
 
     @Column(nullable = false)

@@ -1,34 +1,44 @@
 package com.wallet.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.math.BigDecimal;
-import jakarta.persistence.*;
 
 @Entity
 @Table(name = "wallets")
 public class Wallet {
+
     @Id
     @Column(name = "user_id")
     private long userId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal balance;
 
-    public Wallet(){}
-    public Wallet(long id, BigDecimal balance){
-        this.userId = id;
+    public Wallet() {
+    }
+
+    public Wallet(long userId, BigDecimal balance) {
+        this.userId = userId;
         this.balance = balance;
     }
 
-    public long getUserId(){
-        return this.userId;
+    public long getUserId() {
+        return userId;
     }
-    public void setUserId(long userId){
+
+    public void setUserId(long userId) {
         this.userId = userId;
     }
-    public BigDecimal getBalance(){
-        return this.balance;
+
+    public BigDecimal getBalance() {
+        return balance;
     }
-    public void setBalance(BigDecimal balance){
+
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 

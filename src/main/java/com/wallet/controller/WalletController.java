@@ -1,18 +1,18 @@
 package com.wallet.controller;
 
-
+import com.wallet.dto.MoneyRequestDto;
 import com.wallet.service.WalletService;
+
+import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.Map;
-
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
-public class WalletController{
+public class WalletController {
 
     private final WalletService walletService;
 
@@ -22,24 +22,25 @@ public class WalletController{
     }
 
     @GetMapping("/balance")
-    public Map<String, Object> getBalance(@RequestParam long userId) {
+    public Map<String, Object> getBalance(
+            @RequestParam long userId
+    ) {
 
         return Map.of(
                 "userId", userId,
                 "balance", walletService.getBalance(userId)
         );
-
     }
 
     @PostMapping("/deposit")
     public Map<String, String> deposit(
             @RequestParam long userId,
-            @RequestParam double amount
+            @Valid @RequestBody MoneyRequestDto request
     ) {
 
         walletService.deposit(
                 userId,
-                BigDecimal.valueOf(amount)
+                request.getAmount()
         );
 
         return Map.of(
@@ -51,12 +52,12 @@ public class WalletController{
     @PostMapping("/withdraw")
     public Map<String, String> withdraw(
             @RequestParam long userId,
-            @RequestParam double amount
+            @Valid @RequestBody MoneyRequestDto request
     ) {
 
         walletService.withdraw(
                 userId,
-                BigDecimal.valueOf(amount)
+                request.getAmount()
         );
 
         return Map.of(

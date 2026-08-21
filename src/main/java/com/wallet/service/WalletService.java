@@ -7,7 +7,11 @@ import java.util.List;
 
 public interface WalletService {
 
-    void transfer(long senderId, long receiverId, BigDecimal amount);
+    void transfer(
+            long senderId,
+            long receiverId,
+            BigDecimal amount
+    );
 
     BigDecimal getBalance(long userId);
 

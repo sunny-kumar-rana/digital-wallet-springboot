@@ -2,15 +2,13 @@ package com.wallet.controller;
 
 import com.wallet.dto.TransferRequestDto;
 import com.wallet.service.WalletService;
+
 import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
@@ -24,8 +22,9 @@ public class TransferController {
     }
 
     @PostMapping("/transfer")
-    public Map<String, String> transfer(@Valid @RequestBody TransferRequestDto dto) {
-
+    public Map<String, String> transfer(
+            @Valid @RequestBody TransferRequestDto dto
+    ) {
 
         walletService.transfer(
                 dto.getSenderId(),
@@ -34,7 +33,8 @@ public class TransferController {
         );
 
         return Map.of(
-                "message", "Transfer Successful"
+                "message",
+                "Transfer Successful"
         );
     }
 }

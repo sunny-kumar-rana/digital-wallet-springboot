@@ -9,4 +9,6 @@ public interface UserService {
     void register(RegisterRequestDto dto);
 
     User login(LoginRequestDto dto);
+
+    String generateToken(User user);
 }

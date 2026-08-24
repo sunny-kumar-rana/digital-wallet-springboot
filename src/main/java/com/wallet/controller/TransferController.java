@@ -1,6 +1,7 @@
 package com.wallet.controller;
 
 import com.wallet.dto.TransferRequestDto;
+import com.wallet.security.AuthenticatedUser;
 import com.wallet.service.WalletService;
 
 import jakarta.validation.Valid;
@@ -17,7 +18,9 @@ public class TransferController {
     private final WalletService walletService;
 
     @Autowired
-    public TransferController(WalletService walletService) {
+    public TransferController(
+            WalletService walletService
+    ) {
         this.walletService = walletService;
     }
 
@@ -26,8 +29,11 @@ public class TransferController {
             @Valid @RequestBody TransferRequestDto dto
     ) {
 
+        long senderId =
+                AuthenticatedUser.getUserId();
+
         walletService.transfer(
-                dto.getSenderId(),
+                senderId,
                 dto.getReceiverId(),
                 dto.getAmount()
         );

@@ -1,6 +1,7 @@
 package com.wallet.controller;
 
 import com.wallet.dto.MoneyRequestDto;
+import com.wallet.security.AuthenticatedUser;
 import com.wallet.service.WalletService;
 
 import jakarta.validation.Valid;
@@ -17,26 +18,32 @@ public class WalletController {
     private final WalletService walletService;
 
     @Autowired
-    public WalletController(WalletService walletService) {
+    public WalletController(
+            WalletService walletService
+    ) {
         this.walletService = walletService;
     }
 
     @GetMapping("/balance")
-    public Map<String, Object> getBalance(
-            @RequestParam long userId
-    ) {
+    public Map<String, Object> getBalance() {
+
+        long userId =
+                AuthenticatedUser.getUserId();
 
         return Map.of(
                 "userId", userId,
-                "balance", walletService.getBalance(userId)
+                "balance",
+                walletService.getBalance(userId)
         );
     }
 
     @PostMapping("/deposit")
     public Map<String, String> deposit(
-            @RequestParam long userId,
             @Valid @RequestBody MoneyRequestDto request
     ) {
+
+        long userId =
+                AuthenticatedUser.getUserId();
 
         walletService.deposit(
                 userId,
@@ -51,9 +58,11 @@ public class WalletController {
 
     @PostMapping("/withdraw")
     public Map<String, String> withdraw(
-            @RequestParam long userId,
             @Valid @RequestBody MoneyRequestDto request
     ) {
+
+        long userId =
+                AuthenticatedUser.getUserId();
 
         walletService.withdraw(
                 userId,

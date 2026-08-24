@@ -8,9 +8,6 @@ import java.math.BigDecimal;
 
 public class TransferRequestDto {
 
-    @Positive(message = "Sender ID must be positive")
-    private long senderId;
-
     @Positive(message = "Receiver ID must be positive")
     private long receiverId;
 
@@ -25,21 +22,11 @@ public class TransferRequestDto {
     }
 
     public TransferRequestDto(
-            long senderId,
             long receiverId,
             BigDecimal amount
     ) {
-        this.senderId = senderId;
         this.receiverId = receiverId;
         this.amount = amount;
-    }
-
-    public long getSenderId() {
-        return senderId;
-    }
-
-    public void setSenderId(long senderId) {
-        this.senderId = senderId;
     }
 
     public long getReceiverId() {

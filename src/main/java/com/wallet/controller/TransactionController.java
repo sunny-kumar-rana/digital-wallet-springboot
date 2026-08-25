@@ -1,6 +1,7 @@
 package com.wallet.controller;
 
 import com.wallet.model.Transaction;
+import com.wallet.security.AuthenticatedUser;
 import com.wallet.service.WalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +16,20 @@ public class TransactionController {
     private final WalletService walletService;
 
     @Autowired
-    public TransactionController(WalletService walletService) {
+    public TransactionController(
+            WalletService walletService
+    ) {
         this.walletService = walletService;
     }
 
     @GetMapping("/transactions")
-    public List<Transaction> getTransactions(
-            @RequestParam long userId
-    ) {
+    public List<Transaction> getTransactions() {
 
-        return walletService.getTransactionHistory(userId);
+        long userId =
+                AuthenticatedUser.getUserId();
+
+        return walletService.getTransactionHistory(
+                userId
+        );
     }
 }

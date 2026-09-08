@@ -10,7 +10,8 @@ public interface WalletService {
     void transfer(
             long senderId,
             long receiverId,
-            BigDecimal amount
+            BigDecimal amount,
+            String idempotencyKey
     );
 
     BigDecimal getBalance(long userId);

@@ -4,6 +4,7 @@ import com.wallet.exception.InsufficientBalanceException;
 import com.wallet.exception.WalletNotFoundException;
 import com.wallet.model.Transaction;
 import com.wallet.model.Wallet;
+import com.wallet.repository.IdempotencyRecordRepository;
 import com.wallet.repository.TransactionRepository;
 import com.wallet.repository.WalletRepository;
 
@@ -18,13 +19,16 @@ public class WalletServiceImpl implements WalletService {
 
     private final WalletRepository walletRepository;
     private final TransactionRepository transactionRepository;
+    private final IdempotencyRecordRepository idempotencyRecordRepository;
 
     public WalletServiceImpl(
             WalletRepository walletRepository,
-            TransactionRepository transactionRepository
+            TransactionRepository transactionRepository,
+            IdempotencyRecordRepository idempotencyRecordRepository
     ) {
         this.walletRepository = walletRepository;
         this.transactionRepository = transactionRepository;
+        this.idempotencyRecordRepository = idempotencyRecordRepository;
     }
 
     @Override
@@ -71,25 +75,33 @@ public class WalletServiceImpl implements WalletService {
         );
     }
 
+
     @Override
     @Transactional
     public void transfer(
             long senderId,
             long receiverId,
-            BigDecimal amount
+            BigDecimal amount,
+            String idempotencyKey
     ) {
 
         validateAmount(amount);
         validateDifferentWallets(senderId, receiverId);
+        validateIdempotencyKey(idempotencyKey);
 
-        /*
-         * Always acquire locks in the same order.
-         *
-         * This reduces the possibility of deadlocks when:
-         *
-         * A -> B
-         * B -> A
-         */
+
+        int created =
+                idempotencyRecordRepository.tryCreate(
+                        senderId,
+                        idempotencyKey
+                );
+
+        if (created == 0) {
+
+
+            return;
+        }
+
         Wallet firstWallet;
         Wallet secondWallet;
 
@@ -180,10 +192,8 @@ public class WalletServiceImpl implements WalletService {
             );
         }
 
-        /*
-         * Wallet currently supports two decimal places.
-         */
         if (amount.scale() > 2) {
+
             throw new IllegalArgumentException(
                     "Amount cannot have more than 2 decimal places"
             );
@@ -212,6 +222,24 @@ public class WalletServiceImpl implements WalletService {
 
             throw new InsufficientBalanceException(
                     "Insufficient balance"
+            );
+        }
+    }
+
+    private void validateIdempotencyKey(String idempotencyKey) {
+
+        if (idempotencyKey == null ||
+                idempotencyKey.isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "Idempotency-Key is required"
+            );
+        }
+
+        if (idempotencyKey.length() > 100) {
+
+            throw new IllegalArgumentException(
+                    "Idempotency-Key cannot exceed 100 characters"
             );
         }
     }

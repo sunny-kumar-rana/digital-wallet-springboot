@@ -26,7 +26,9 @@ public class TransferController {
 
     @PostMapping("/transfer")
     public Map<String, String> transfer(
-            @Valid @RequestBody TransferRequestDto dto
+            @Valid @RequestBody TransferRequestDto dto,
+            @RequestHeader(value = "Idempotency-Key", required = false)
+            String idempotencyKey
     ) {
 
         long senderId =
@@ -35,7 +37,8 @@ public class TransferController {
         walletService.transfer(
                 senderId,
                 dto.getReceiverId(),
-                dto.getAmount()
+                dto.getAmount(),
+                idempotencyKey
         );
 
         return Map.of(

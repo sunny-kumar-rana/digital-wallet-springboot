@@ -78,7 +78,7 @@ POST `/register`
 {
   "name": "Shubh",
   "email": "shubh@gmail.com",
-  "password": "1234"
+  "password": "your-password"
 }
 ```
 
@@ -91,7 +91,7 @@ POST `/login`
 ```json
 {
   "email": "shubh@gmail.com",
-  "password": "1234"
+  "password": "your-password"
 }
 ```
 
@@ -140,8 +140,8 @@ Update:
 
 ```properties
 spring.datasource.url=jdbc:oracle:thin:@localhost:1521:xe
-spring.datasource.username=wallet
-spring.datasource.password=Admin
+spring.datasource.username=<your-db-username>
+spring.datasource.password=<your-db-password>
 spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
 ```
 

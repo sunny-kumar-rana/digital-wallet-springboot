@@ -2,6 +2,8 @@ package com.wallet.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -38,14 +40,20 @@ public class Transaction {
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type", nullable = false)
-    private String transactionType;
+    private TransactionType transactionType;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status;
+    private TransactionStatus status;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(
+            name = "created_at",
+            nullable = false,
+            updatable = false
+    )
     private LocalDateTime createdAt;
 
     public Transaction() {
@@ -55,8 +63,8 @@ public class Transaction {
             long senderId,
             long receiverId,
             BigDecimal amount,
-            String transactionType,
-            String status
+            TransactionType transactionType,
+            TransactionStatus status
     ) {
         this.senderId = senderId;
         this.receiverId = receiverId;
@@ -97,19 +105,19 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public String getTransactionType() {
+    public TransactionType getTransactionType() {
         return transactionType;
     }
 
-    public void setTransactionType(String transactionType) {
+    public void setTransactionType(TransactionType transactionType) {
         this.transactionType = transactionType;
     }
 
-    public String getStatus() {
+    public TransactionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TransactionStatus status) {
         this.status = status;
     }
 
@@ -128,8 +136,8 @@ public class Transaction {
                 ", senderId=" + senderId +
                 ", receiverId=" + receiverId +
                 ", amount=" + amount +
-                ", transactionType='" + transactionType + '\'' +
-                ", status='" + status + '\'' +
+                ", transactionType=" + transactionType +
+                ", status=" + status +
                 ", createdAt=" + createdAt +
                 '}';
     }

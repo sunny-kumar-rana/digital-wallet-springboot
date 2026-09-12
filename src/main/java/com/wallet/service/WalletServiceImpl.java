@@ -3,6 +3,8 @@ package com.wallet.service;
 import com.wallet.exception.InsufficientBalanceException;
 import com.wallet.exception.WalletNotFoundException;
 import com.wallet.model.Transaction;
+import com.wallet.model.TransactionStatus;
+import com.wallet.model.TransactionType;
 import com.wallet.model.Wallet;
 import com.wallet.repository.IdempotencyRecordRepository;
 import com.wallet.repository.TransactionRepository;
@@ -39,16 +41,15 @@ public class WalletServiceImpl implements WalletService {
 
         Wallet wallet = getWalletForUpdate(userId);
 
-        BigDecimal newBalance =
-                wallet.getBalance().add(amount);
-
-        wallet.setBalance(newBalance);
+        wallet.setBalance(
+                wallet.getBalance().add(amount)
+        );
 
         saveTransaction(
                 userId,
                 userId,
                 amount,
-                "DEPOSIT"
+                TransactionType.DEPOSIT
         );
     }
 
@@ -62,23 +63,21 @@ public class WalletServiceImpl implements WalletService {
 
         validateSufficientBalance(wallet, amount);
 
-        BigDecimal newBalance =
-                wallet.getBalance().subtract(amount);
-
-        wallet.setBalance(newBalance);
+        wallet.setBalance(
+                wallet.getBalance().subtract(amount)
+        );
 
         saveTransaction(
                 userId,
                 userId,
                 amount,
-                "WITHDRAW"
+                TransactionType.WITHDRAW
         );
     }
 
-
     @Override
     @Transactional
-    public void transfer(
+    public boolean transfer(
             long senderId,
             long receiverId,
             BigDecimal amount,
@@ -89,7 +88,6 @@ public class WalletServiceImpl implements WalletService {
         validateDifferentWallets(senderId, receiverId);
         validateIdempotencyKey(idempotencyKey);
 
-
         int created =
                 idempotencyRecordRepository.tryCreate(
                         senderId,
@@ -97,21 +95,16 @@ public class WalletServiceImpl implements WalletService {
                 );
 
         if (created == 0) {
-
-
-            return;
+            return true;
         }
 
         Wallet firstWallet;
         Wallet secondWallet;
 
         if (senderId < receiverId) {
-
             firstWallet = getWalletForUpdate(senderId);
             secondWallet = getWalletForUpdate(receiverId);
-
         } else {
-
             firstWallet = getWalletForUpdate(receiverId);
             secondWallet = getWalletForUpdate(senderId);
         }
@@ -140,14 +133,15 @@ public class WalletServiceImpl implements WalletService {
                 senderId,
                 receiverId,
                 amount,
-                "TRANSFER"
+                TransactionType.TRANSFER
         );
+
+        return false;
     }
 
     @Override
     @Transactional(readOnly = true)
     public BigDecimal getBalance(long userId) {
-
         return getWallet(userId).getBalance();
     }
 
@@ -206,7 +200,6 @@ public class WalletServiceImpl implements WalletService {
     ) {
 
         if (senderId == receiverId) {
-
             throw new IllegalArgumentException(
                     "Sender and receiver cannot be the same"
             );
@@ -219,14 +212,15 @@ public class WalletServiceImpl implements WalletService {
     ) {
 
         if (wallet.getBalance().compareTo(amount) < 0) {
-
             throw new InsufficientBalanceException(
                     "Insufficient balance"
             );
         }
     }
 
-    private void validateIdempotencyKey(String idempotencyKey) {
+    private void validateIdempotencyKey(
+            String idempotencyKey
+    ) {
 
         if (idempotencyKey == null ||
                 idempotencyKey.isBlank()) {
@@ -248,7 +242,7 @@ public class WalletServiceImpl implements WalletService {
             long senderId,
             long receiverId,
             BigDecimal amount,
-            String transactionType
+            TransactionType transactionType
     ) {
 
         Transaction transaction = new Transaction();
@@ -257,7 +251,7 @@ public class WalletServiceImpl implements WalletService {
         transaction.setReceiverId(receiverId);
         transaction.setAmount(amount);
         transaction.setTransactionType(transactionType);
-        transaction.setStatus("SUCCESS");
+        transaction.setStatus(TransactionStatus.SUCCESS);
 
         transactionRepository.save(transaction);
     }

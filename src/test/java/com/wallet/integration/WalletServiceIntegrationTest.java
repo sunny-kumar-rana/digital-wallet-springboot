@@ -2,13 +2,15 @@ package com.wallet.integration;
 
 import com.wallet.exception.InsufficientBalanceException;
 import com.wallet.model.Transaction;
+import com.wallet.model.TransactionStatus;
+import com.wallet.model.TransactionType;
 import com.wallet.model.Wallet;
 import com.wallet.repository.TransactionRepository;
 import com.wallet.repository.WalletRepository;
 import com.wallet.service.WalletService;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.AfterAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -17,12 +19,11 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -106,8 +107,14 @@ class WalletServiceIntegrationTest {
                 new BigDecimal("250.00"),
                 transaction.getAmount()
         );
-        assertEquals("DEPOSIT", transaction.getTransactionType());
-        assertEquals("SUCCESS", transaction.getStatus());
+        assertEquals(
+                TransactionType.DEPOSIT,
+                transaction.getTransactionType()
+        );
+        assertEquals(
+                TransactionStatus.SUCCESS,
+                transaction.getStatus()
+        );
         assertNotNull(transaction.getCreatedAt());
     }
 
@@ -161,8 +168,14 @@ class WalletServiceIntegrationTest {
                 new BigDecimal("250.00"),
                 transaction.getAmount()
         );
-        assertEquals("TRANSFER", transaction.getTransactionType());
-        assertEquals("SUCCESS", transaction.getStatus());
+        assertEquals(
+                TransactionType.TRANSFER,
+                transaction.getTransactionType()
+        );
+        assertEquals(
+                TransactionStatus.SUCCESS,
+                transaction.getStatus()
+        );
         assertNotNull(transaction.getCreatedAt());
     }
 
@@ -189,11 +202,23 @@ class WalletServiceIntegrationTest {
                 idempotencyKey
         );
 
-        Wallet sender = walletRepository.findById(1L).orElseThrow();
-        Wallet receiver = walletRepository.findById(2L).orElseThrow();
+        Wallet sender = walletRepository
+                .findById(1L)
+                .orElseThrow();
 
-        assertEquals(new BigDecimal("750.00"), sender.getBalance());
-        assertEquals(new BigDecimal("750.00"), receiver.getBalance());
+        Wallet receiver = walletRepository
+                .findById(2L)
+                .orElseThrow();
+
+        assertEquals(
+                new BigDecimal("750.00"),
+                sender.getBalance()
+        );
+
+        assertEquals(
+                new BigDecimal("750.00"),
+                receiver.getBalance()
+        );
 
         List<Transaction> transactions =
                 transactionRepository
@@ -203,7 +228,8 @@ class WalletServiceIntegrationTest {
     }
 
     @Test
-    void concurrentTransfers_shouldPreserveBalanceConsistency() throws Exception {
+    void concurrentTransfers_shouldPreserveBalanceConsistency()
+            throws Exception {
 
         walletRepository.save(
                 new Wallet(2L, new BigDecimal("500.00"))
@@ -242,12 +268,23 @@ class WalletServiceIntegrationTest {
 
         executor.shutdown();
 
-        Wallet sender = walletRepository.findById(1L).orElseThrow();
-        Wallet receiver = walletRepository.findById(2L).orElseThrow();
+        Wallet sender = walletRepository
+                .findById(1L)
+                .orElseThrow();
+
+        Wallet receiver = walletRepository
+                .findById(2L)
+                .orElseThrow();
 
         assertEquals(1, successfulTransfers);
-        assertEquals(new BigDecimal("400.00"), sender.getBalance());
-        assertEquals(new BigDecimal("1100.00"), receiver.getBalance());
+        assertEquals(
+                new BigDecimal("400.00"),
+                sender.getBalance()
+        );
+        assertEquals(
+                new BigDecimal("1100.00"),
+                receiver.getBalance()
+        );
 
         List<Transaction> transactions =
                 transactionRepository
@@ -273,11 +310,23 @@ class WalletServiceIntegrationTest {
                 )
         );
 
-        Wallet sender = walletRepository.findById(1L).orElseThrow();
-        Wallet receiver = walletRepository.findById(2L).orElseThrow();
+        Wallet sender = walletRepository
+                .findById(1L)
+                .orElseThrow();
 
-        assertEquals(new BigDecimal("1000.00"), sender.getBalance());
-        assertEquals(new BigDecimal("500.00"), receiver.getBalance());
+        Wallet receiver = walletRepository
+                .findById(2L)
+                .orElseThrow();
+
+        assertEquals(
+                new BigDecimal("1000.00"),
+                sender.getBalance()
+        );
+
+        assertEquals(
+                new BigDecimal("500.00"),
+                receiver.getBalance()
+        );
 
         assertEquals(0, transactionRepository.count());
     }
@@ -295,9 +344,15 @@ class WalletServiceIntegrationTest {
                 )
         );
 
-        Wallet wallet = walletRepository.findById(1L).orElseThrow();
+        Wallet wallet = walletRepository
+                .findById(1L)
+                .orElseThrow();
 
-        assertEquals(new BigDecimal("1000.00"), wallet.getBalance());
+        assertEquals(
+                new BigDecimal("1000.00"),
+                wallet.getBalance()
+        );
+
         assertEquals(0, transactionRepository.count());
     }
 
@@ -320,6 +375,4 @@ class WalletServiceIntegrationTest {
 
         assertEquals(0, transactionRepository.count());
     }
-
-
 }

@@ -77,7 +77,11 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/login",
                                 "/register",
-                                "/error"
+                                "/error",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/actuator/health"
                         ).permitAll()
 
                         .anyRequest().authenticated()

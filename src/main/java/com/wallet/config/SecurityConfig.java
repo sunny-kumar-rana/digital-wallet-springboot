@@ -2,22 +2,20 @@ package com.wallet.config;
 
 import com.wallet.security.JwtAuthenticationFilter;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-
-import org.springframework.security.config.annotation.authentication.configuration
-        .AuthenticationConfiguration;
-
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-
 import org.springframework.security.config.http.SessionCreationPolicy;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -35,13 +33,11 @@ public class SecurityConfig {
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) {
-        this.jwtAuthenticationFilter =
-                jwtAuthenticationFilter;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-
         return new BCryptPasswordEncoder();
     }
 
@@ -67,6 +63,15 @@ public class SecurityConfig {
                         )
                 )
 
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(
+                                authenticationEntryPoint()
+                        )
+                        .accessDeniedHandler(
+                                accessDeniedHandler()
+                        )
+                )
+
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers(
@@ -84,6 +89,56 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+
+        return (request, response, authException) -> {
+
+            response.setStatus(
+                    HttpServletResponse.SC_UNAUTHORIZED
+            );
+
+            response.setContentType(
+                    "application/json"
+            );
+
+            response.getWriter().write(
+                    """
+                    {
+                        "status": 401,
+                        "error": "Unauthorized",
+                        "message": "Authentication is required"
+                    }
+                    """
+            );
+        };
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+
+        return (request, response, accessDeniedException) -> {
+
+            response.setStatus(
+                    HttpServletResponse.SC_FORBIDDEN
+            );
+
+            response.setContentType(
+                    "application/json"
+            );
+
+            response.getWriter().write(
+                    """
+                    {
+                        "status": 403,
+                        "error": "Forbidden",
+                        "message": "Access is denied"
+                    }
+                    """
+            );
+        };
     }
 
     @Bean
@@ -129,23 +184,5 @@ public class SecurityConfig {
     ) throws Exception {
 
         return configuration.getAuthenticationManager();
-    }
-
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider(
-            com.wallet.security.CustomUserDetailsService
-                    userDetailsService
-    ) {
-
-        DaoAuthenticationProvider provider =
-                new DaoAuthenticationProvider(
-                        userDetailsService
-                );
-
-        provider.setPasswordEncoder(
-                passwordEncoder()
-        );
-
-        return provider;
     }
 }
